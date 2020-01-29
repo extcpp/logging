@@ -1,0 +1,6 @@
+[submodule "ext-basics"]
+	path = external_libs/ext-basics
+	url = https://github.com/extcpp/basics.git
+[submodule "cmake"]
+	path = cmake
+	url = https://github.com/extcpp/cmake.git
