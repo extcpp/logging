@@ -108,6 +108,8 @@ if(COMMAND ext_install)
     install(TARGETS ext-logging
         EXPORT ext-logging-targets
         DESTINATION ${CMAKE_INSTALL_PREFIX}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
 	install(
         EXPORT ext-logging-targets
