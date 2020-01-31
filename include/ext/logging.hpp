@@ -33,11 +33,12 @@
 // inactivity completely away. If you want the level to be configurable at
 // runtime you need to pay for it by having the instructions in your code.
 
-// TODO -- static_assert parameters
+// non static
 #define _EXT_LOG_INTERNAL(id_, topic_, macro_level_, cond_)                        \
     if (ext::logging::_detail::level_is_active((macro_level_), (topic_)) && cond_) \
     ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
 
+// static
 #define _EXT_LOG_INTERNAL_STATIC(id_, topic_, macro_level_, cond_)               \
     if constexpr (ext::logging::_detail::default_level_is_active((macro_level_))       \
         ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
@@ -51,13 +52,13 @@
 #define _EXT_LOG_SELECT5TH_PARAMETER(_1, _2, _3, _4, NAME, ...) NAME
 
 // constexpr macros
-#define EXT_LOGC4(id, topic_, macro_level_, cond_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, macro_level_, cond_)
+#define EXT_LOGVARIABLE4(id, topic_, macro_level_, cond_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, macro_level_, cond_)
 
-#define EXT_LOGC3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, topic_, macro_level_, true)
+#define EXT_LOGVARIABLE3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, topic_, macro_level_, true)
 
-#define EXT_LOGC2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, macro_level_, true)
+#define EXT_LOGVARIABLE2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, macro_level_, true)
 
-#define EXT_LOGC1(id) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
+#define EXT_LOGVARIABLE1(id) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
 
 #define EXT_DEVC _EXT_LOG_INTERNAL_ADD_PREFIX("@@@@", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
 
@@ -66,34 +67,34 @@
 #ifdef EXT_COMPILER_VC
     // __VA_ARGS__ does not expand on VisualStudio compiler :(
     #define _EXT_LOG_EXPAND(x) x
-    #define EXT_LOGC(...)                                                                                        \
-        _EXT_LOG_SELECT5TH_PARAMETER(_EXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGC4, EXT_LOGC3, EXT_LOGC2, EXT_LOGC1, ) \
+    #define EXT_LOGVARIABLE(...)                                                                                        \
+        _EXT_LOG_SELECT5TH_PARAMETER(_EXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
         (_EXT_LOG_EXPAND(__VA_ARGS__))
 #else
-    #define EXT_LOGC(...)                                                                       \
-        _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGC4, EXT_LOGC3, EXT_LOGC2, EXT_LOGC1, ) \
+    #define EXT_LOGVARIABLE(...)                                                                       \
+        _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
         (__VA_ARGS__)
 #endif // EXT_COMPILER_VC
 
 // runtime configurable macros
-#define EXT_LOGV4(id, topic_, macro_level_, cond_) \
+#define EXT_LOGSTATIC4(id, topic_, macro_level_, cond_) \
     _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, macro_level_, cond_)
 
-#define EXT_LOGV3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, topic_, macro_level_, true)
+#define EXT_LOGSTATIC3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, topic_, macro_level_, true)
 
-#define EXT_LOGV2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, macro_level_, true)
+#define EXT_LOGSTATIC2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, macro_level_, true)
 
-#define EXT_LOGV1(id) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
+#define EXT_LOGSTATIC1(id) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
 
 #define EXT_DEVV _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC("$$$$", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
 
-#define EXT_LOGV(...)                                                                       \
-    _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGV4, EXT_LOGV3, EXT_LOGV2, EXT_LOGV1, ) \
+#define EXT_LOGSTATIC(...)                                                                       \
+    _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGSTATIC4, EXT_LOGSTATIC3, EXT_LOGSTATIC2, EXT_LOGSTATIC1, ) \
     (__VA_ARGS__)
 
 // set default macros
-#define EXT_LOG EXT_LOGC
-#define EXT_LOG_STATIC EXT_LOGV
+#define EXT_LOG EXT_LOGVARIABLE
+#define EXT_LOG_STATIC EXT_LOGSTATIC
 #define EXT_DEV EXT_DEVC
 
 #endif // EXT_LOGGING_HEADER

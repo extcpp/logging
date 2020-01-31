@@ -69,7 +69,11 @@ target_compile_options(ext-logging PRIVATE ${ext_stone-warnings})
 target_compile_definitions(ext-logging PUBLIC ${ext_common_compile_definitions})
 target_compile_definitions(ext-logging PUBLIC EXT_SHARED_LIB)
 target_compile_definitions(ext-logging PRIVATE EXT_IN_LIB=1)
-target_link_libraries(ext-logging PUBLIC ext::basics Threads::Threads)
+target_link_libraries(ext-logging PUBLIC
+    ext::basics
+    Threads::Threads
+    $<$<BOOL:UNIX>:stdc++fs>
+)
 
 # set up folder structure for XCode and VisualStudio
 set_target_properties (ext-logging PROPERTIES FOLDER logging)

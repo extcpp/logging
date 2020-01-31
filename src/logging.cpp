@@ -17,13 +17,13 @@ EXT_INIT_PRIORITY_GNU(102)
 std::map<int, _detail::logtopic*> _detail::topics_map{};
 
 EXT_INIT_PRIORITY_GNU(103)
-_detail::logtopic topic::no_topic{1, "default"s, level::info};
+_detail::logtopic topic::no_topic{1, "default"s, level::warn};
 EXT_INIT_PRIORITY_GNU(103)
 _detail::logtopic topic::dev{2, "development"s, level::debug};
 EXT_INIT_PRIORITY_GNU(103)
-_detail::logtopic topic::network{3, "network"s, level::error};
+_detail::logtopic topic::network{3, "network"s, level::warn};
 EXT_INIT_PRIORITY_GNU(103)
-_detail::logtopic topic::engine{4, "engine"s, level::error};
+_detail::logtopic topic::engine{4, "engine"s, level::warn};
 
 bool configuration::prefix_newline{false};
 bool configuration::append_newline{true};

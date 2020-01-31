@@ -17,6 +17,13 @@ inline bool level_is_active(level macro_level, logtopic topic = topic::no_topic)
     // activation_level 60(info) && macro_level 20 (error) -> log
     // activation_level 60(info) && macro_level 100(trace) -> no log
     // activation level must be greater than macro level
+#ifdef NOT_DEFINED
+    std::cerr << "####################" << std::endl;
+    std::cerr << "activation_level: " << level_to_str(topic.activation_level) << std::endl;
+    std::cerr << "macro_level: " << level_to_str(macro_level) << std::endl;
+    std::cerr << "activates: " << std::boolalpha << (topic.activation_level >= macro_level) << std::endl;
+    std::cerr << "####################" << std::endl;
+#endif
     return topic.activation_level >= macro_level;
 }
 
