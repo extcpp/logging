@@ -2,7 +2,6 @@
 // Please see LICENSE.md for license or visit https://github.com/extcpp/basics
 #include <cstring>
 #include <fstream>
-#include <filesystem>
 
 #include <gtest/gtest.h>
 
@@ -21,7 +20,6 @@ struct LoggingTest : public ::testing::Test {
         ext::logging::configuration::stream = &_log;
     };
 
-
     void compare(std::string const& expected = ""){
         _log.close();
         std::ifstream file{"test.log"};
@@ -29,14 +27,6 @@ struct LoggingTest : public ::testing::Test {
         std::string logged{std::istreambuf_iterator<char>(file), eos};
         ASSERT_EQ(expected, logged);
     }
-
-    std::string path() {
-        auto path = std::filesystem::current_path().parent_path()
-                                              .parent_path()
-                                              .parent_path()
-                                              / "logging" / "tests" / "logging.cpp";
-        return path.string();
-    };
 
     std::string line() {
         return std::to_string(_line);
@@ -59,7 +49,7 @@ TEST_F(LoggingTest, logging_no_crash_gdb_vim) {
     ASSERT_NO_THROW(EXT_LOG("babe") << "cafe?");
 
     compare(
-        "# vim "s + path() + " +" + line() +"\n"
+        "# vim /data/home/oberon/repos/extcpp/logging/tests/logging.cpp +"s + line() +"\n"
         "# break logging.cpp:" + line() + "\n"
         "[babe] warning in TestBody(): 'cafe?'\n"
     );
