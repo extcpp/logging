@@ -28,39 +28,22 @@
 #include <iostream>
 #include <type_traits>
 
-// If use_default is true the check becomes constexpr. Therefore the compiler
-// can optimize the branch containing the logging instructions in case of
-// inactivity completely away. If you want the level to be configurable at
-// runtime you need to pay for it by having the instructions in your code.
+// helper
+#define _EXT_LOG_SELECT5TH_PARAMETER(_1, _2, _3, _4, NAME, ...) NAME
 
-// non static
+
+// variable logging - if() ...
 #define _EXT_LOG_INTERNAL(id_, topic_, macro_level_, cond_)                        \
-    if (ext::logging::_detail::level_is_active((macro_level_), (topic_)) && cond_) \
+    if (ext::logging::_detail::variable_level_is_active((macro_level_), (topic_)) && cond_) \
     ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
-
-// static
-#define _EXT_LOG_INTERNAL_STATIC(id_, topic_, macro_level_, cond_)               \
-    if constexpr (ext::logging::_detail::default_level_is_active((macro_level_))       \
-        ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
 
 #define _EXT_LOG_INTERNAL_ADD_PREFIX(id_, topic_, macro_level_, cond_) \
     _EXT_LOG_INTERNAL(id_, (ext::logging::topic::topic_), (ext::logging::level::macro_level_), cond_)
 
-#define _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id_, topic_, macro_level_, cond_) \
-    _EXT_LOG_INTERNAL(id_, (ext::logging::topic::topic_), (ext::logging::level::macro_level_), cond_)
-
-#define _EXT_LOG_SELECT5TH_PARAMETER(_1, _2, _3, _4, NAME, ...) NAME
-
-// constexpr macros
-#define EXT_LOGVARIABLE4(id, topic_, macro_level_, cond_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, macro_level_, cond_)
-
+#define EXT_LOGVARIABLE4(id, topic_, macro_level_, cond_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, topic_, macro_level_, cond_)
 #define EXT_LOGVARIABLE3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, topic_, macro_level_, true)
-
 #define EXT_LOGVARIABLE2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, macro_level_, true)
-
 #define EXT_LOGVARIABLE1(id) _EXT_LOG_INTERNAL_ADD_PREFIX(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
-
-#define EXT_DEVC _EXT_LOG_INTERNAL_ADD_PREFIX("@@@@", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
 
 // 1st __VA_ARGS__ shifts the args into the correct position
 // macro can not be empty because of the leading `,` (fixed with __VA_OPT__ in c++20)
@@ -76,25 +59,37 @@
         (__VA_ARGS__)
 #endif // EXT_COMPILER_VC
 
-// runtime configurable macros
-#define EXT_LOGSTATIC4(id, topic_, macro_level_, cond_) \
-    _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, macro_level_, cond_)
+#define EXT_DEV_VARIABLE _EXT_LOG_INTERNAL_ADD_PREFIX("$$$$", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
+#define EXT_DEV_IF(cond_) _EXT_LOG_INTERNAL_ADD_PREFIX("$$$$", dev, EXT_LOGGING_DEFAULT_LEVEL, cond_)
+#define EXT_LOG EXT_LOGVARIABLE
 
-#define EXT_LOGSTATIC3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, topic_, macro_level_, true)
 
-#define EXT_LOGSTATIC2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, macro_level_, true)
+// This is still a bit experimental:
+// constexpr if() does not seem to work in a macro is there some way that guarantees the evaluation
+// at compile time. Otherwise it would be better to remove this code in order to reduce the complexity.
 
-#define EXT_LOGSTATIC1(id) _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
+#define _EXT_LOG_INTERNAL_CONST(id_, topic_, macro_level_, cond_)               \
+    if constexpr (ext::logging::_detail::constexpr_level_is_active(macro_level_) && cond_)      \
+        ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
 
-#define EXT_DEVV _EXT_LOG_INTERNAL_ADD_PREFIX_STATIC("$$$$", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
+#define _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id_, topic_, macro_level_, cond_) \
+    _EXT_LOG_INTERNAL_CONST(id_, (ext::logging::topic::topic_), (ext::logging::level::macro_level_), cond_)
 
-#define EXT_LOGSTATIC(...)                                                                       \
-    _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGSTATIC4, EXT_LOGSTATIC3, EXT_LOGSTATIC2, EXT_LOGSTATIC1, ) \
+
+#define EXT_LOGCONST4(id, topic_, macro_level_, cond_) \
+    _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, topic_, macro_level_, cond_)
+
+#define EXT_LOGCONST3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, topic_, macro_level_, true)
+#define EXT_LOGCONST2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, macro_level_, true)
+#define EXT_LOGCONST1(id) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
+
+#define EXT_LOGCONST(...)                                                                       \
+    _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
     (__VA_ARGS__)
 
-// set default macros
-#define EXT_LOG EXT_LOGVARIABLE
-#define EXT_LOG_STATIC EXT_LOGSTATIC
-#define EXT_DEV EXT_DEVC
+#define EXT_DEV _EXT_LOG_INTERNAL_ADD_PREFIX_CONST("@@@@", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
+#define EXT_DEV_IF_CONST(cond_) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST("@@@@", dev, EXT_LOGGING_DEFAULT_LEVEL, cond_)
+#define EXT_LOG_CONST EXT_LOGCONST
+
 
 #endif // EXT_LOGGING_HEADER

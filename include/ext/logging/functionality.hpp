@@ -13,7 +13,7 @@
 namespace ext { namespace logging {
 
 namespace _detail {
-inline bool level_is_active(level macro_level, logtopic topic = topic::no_topic) {
+inline bool variable_level_is_active(level macro_level, logtopic topic = topic::no_topic) {
     // activation_level 60(info) && macro_level 20 (error) -> log
     // activation_level 60(info) && macro_level 100(trace) -> no log
     // activation level must be greater than macro level
@@ -27,7 +27,7 @@ inline bool level_is_active(level macro_level, logtopic topic = topic::no_topic)
     return topic.activation_level >= macro_level;
 }
 
-inline constexpr bool default_level_is_active(level macro_level) {
+inline constexpr bool constexpr_level_is_active(level macro_level) {
     return _detail::logtopic::default_level >= macro_level;
 }
 

@@ -9,7 +9,7 @@
 
 struct test {
 	test() {
-		EXT_LOG("test class", error) << "hello form ctor";
+		EXT_LOG("test class", error) << "hello from ctor";
 	}
 };
 
@@ -24,7 +24,12 @@ int main(/*int argc, const char *argv[]*/) {
     el::set_level_all(ext::logging::level::info);
 
     EXT_DEV << "foo";
-    EXT_DEVV << "bar";
+    EXT_DEV_IF(true) << "bar";
+    EXT_DEV_IF_CONST(false) << "foo";
+    volatile bool v = false;
+    (void) v;
+    //EXT_DEV_IF_CONST(v) << "foo"; // if constexpr condition is not a constant expression
+    EXT_DEV_VARIABLE << "bar";
 
 	// clang-format off
     EXT_LOG("hi mic", warn) << "1" << "2" << "3";
@@ -37,11 +42,11 @@ int main(/*int argc, const char *argv[]*/) {
 
     el::set_level_all(ext::logging::level::error);
     EXT_LOG("2222", info) << "Hi there!";
-    EXT_LOG_STATIC("3333", warn) << "something is wrong";
-    EXT_LOG_STATIC("3333", warn) << "something is wrong";
+    EXT_LOG_CONST("3333", warn) << "something is wrong";
+    EXT_LOG_CONST("3333", warn) << "something is wrong";
 
-    EXT_LOG_STATIC("4444", network, error, false) << "your network is broken";
-    EXT_LOG_STATIC("5555", network, error, true) << "your network is broken";
+    EXT_LOG_CONST("4444", network, error, false) << "your network is broken";
+    EXT_LOG_CONST("5555", network, error, true) << "your network is broken";
     EXT_LOG("music", network, warn) << "Green Day";
     EXT_LOG("6666", fatal) << "your app will terminate";
 
