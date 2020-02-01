@@ -29,8 +29,10 @@ bool configuration::prefix_newline{false};
 bool configuration::append_newline{true};
 bool configuration::filename{true};
 bool configuration::function{true};
+#ifdef EXT_LOGGING_ENABLE_VIM_GDB
 bool configuration::vim{false};
 bool configuration::gdb{false};
+#endif
 std::ostream* configuration::stream = &std::cout;
 
 EXT_INIT_PRIORITY_VC_LOW
@@ -45,16 +47,19 @@ _detail::logger::logger(
     if (configuration::prefix_newline) {
         _ss << "\n";
     }
+
+#ifdef EXT_LOGGING_ENABLE_VIM_GDB
     // # vim <filename> +<lineno>
     if (configuration::vim) {
         _ss << "# vim " << file_name << " +" << line_no << "\n";
     }
 
     if (configuration::gdb) {
-#ifndef _WIN32
+    #ifndef _WIN32
         _ss << "# break " << ext::util::filename(file_name) << ":" << line_no << "\n";
-#endif
+    #endif
     }
+#endif
 
     if (true) {
         _ss << "[" << id << "] ";
@@ -69,7 +74,6 @@ _detail::logger::logger(
 
     // log filename
     if (configuration::filename) {
-        if (!configuration::gdb) {
             _ss << " "
 #ifndef _WIN32
                 << ext::util::filename(file_name)
@@ -77,7 +81,6 @@ _detail::logger::logger(
                 << file_name
 #endif
                 << ":" << line_no;
-        }
     }
 
     // log function name
@@ -104,6 +107,7 @@ void _detail::logger::write() {
 _detail::logger::~logger() {
     try {
         write();
-    } catch (...) {}
+    } catch (...) {
+    }
 }
 }} // namespace ext::logging

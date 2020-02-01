@@ -71,8 +71,10 @@ EXT_EXPORT_VC extern bool append_newline;
 EXT_EXPORT_VC extern bool threads;
 EXT_EXPORT_VC extern bool filename;
 EXT_EXPORT_VC extern bool function;
+#ifdef EXT_LOGGING_ENABLE_VIM_GDB
 EXT_EXPORT_VC extern bool vim;
 EXT_EXPORT_VC extern bool gdb;
+#endif
 EXT_EXPORT_VC extern std::ostream* stream;
 } // namespace configuration
 

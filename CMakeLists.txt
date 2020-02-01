@@ -11,6 +11,7 @@ option(EXTLOG_EXAMPLES "build examples" OFF)
 option(EXTLOG_WARNINGS "enable warnings" ON)
 option(EXTLOG_CHECKED "user assert" ON)
 option(EXTLOG_TESTS "build tests" OFF)
+option(EXTLOG_ENABLE_VIM_GDB "support vim / gdb" ON)
 
 ## general setup and includes
 set(CMAKE_CXX_STANDARD 17)
@@ -56,7 +57,7 @@ set(ext_common_compile_definitions
     $<IF:$<BOOL:${ext_is_big_endian}>,EXT_BIG_ENDIAN,EXT_LITTLE_ENDIAN>
     $<$<BOOL:${EXT_CXX_COMPILER_IS_GCC}>:EXT_GCC>
     $<$<BOOL:${EXT_CXX_COMPILER_IS_CLANG}>:EXT_CLANG>
-    $<$<BOOL:${ext_l1_cache_line_size}>:EXT_KNOWN_L1_CACHE_LINE_SIZE=${ext_l1_cache_line_size}>
+    $<$<BOOL:${EXTLOG_ENABLE_VIM_GDB}>:EXT_LOGGING_ENABLE_VIM_GDB>
 )
 
 
@@ -68,8 +69,8 @@ target_include_directories(ext-logging PUBLIC
 target_compile_features(ext-logging PUBLIC cxx_std_17)
 target_compile_options(ext-logging PRIVATE ${ext_stone-warnings})
 target_compile_definitions(ext-logging PUBLIC ${ext_common_compile_definitions})
-target_compile_definitions(ext-logging PUBLIC EXT_SHARED_LIB)
 target_compile_definitions(ext-logging PRIVATE EXT_IN_LIB=1)
+
 target_link_libraries(ext-logging PUBLIC
     ext::basics
     Threads::Threads

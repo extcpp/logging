@@ -1,8 +1,8 @@
 // Copyright - 2016-2020 - Jan Christoph Uhde <Jan@UhdeJC.com>
 // Please see LICENSE.md for license or visit https://github.com/extcpp/basics
 #include <cstring>
-#include <fstream>
 #include <filesystem>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -17,23 +17,20 @@
 using namespace std::literals;
 
 struct LoggingTest : public ::testing::Test {
-    LoggingTest() : _log{"test.log", std::ios::trunc} {
+    LoggingTest() : _log{} {
         using namespace ext::logging;
         configuration::stream = &_log;
+#ifdef EXT_LOGGING_ENABLE_VIM_GDB
         configuration::gdb = false;
         configuration::vim = false;
+#endif
         configuration::prefix_newline = false;
         configuration::append_newline = true;
         set_level_all(level::EXT_LOGGING_DEFAULT_LEVEL);
     };
 
-
     void compare(std::string const& expected = ""){
-        _log.close();
-        std::ifstream file{"test.log"};
-        std::istreambuf_iterator<char> eos;
-        std::string logged{std::istreambuf_iterator<char>(file), eos};
-        ASSERT_EQ(expected, logged);
+        ASSERT_EQ(expected, _log.str());
     }
 
     std::string path() {
@@ -48,7 +45,7 @@ struct LoggingTest : public ::testing::Test {
         return std::to_string(_line);
     }
 
-    std::ofstream _log;
+    std::stringstream _log;
     std::size_t _line;
 
 };
@@ -56,16 +53,20 @@ using LoggingDeathTest = LoggingTest;
 
 TEST_F(LoggingTest, logging_no_crash_gdb_vim) {
     using namespace ext::logging;
+#ifdef EXT_LOGGING_ENABLE_VIM_GDB
     configuration::gdb = true;
     configuration::vim = true;
+#endif
 
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("babe") << "cafe?");
 
     compare(
+#ifdef EXT_LOGGING_ENABLE_VIM_GDB
         "# vim "s + path() + " +" + line() +"\n"
         "# break logging.cpp:" + line() + "\n"
-        "[babe] warning in TestBody(): 'cafe?'\n"
+#endif
+        "[babe] warning logging.cpp:"s + line() + " in TestBody(): 'cafe?'\n"
     );
 }
 
