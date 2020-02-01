@@ -18,7 +18,13 @@ using namespace std::literals;
 
 struct LoggingTest : public ::testing::Test {
     LoggingTest() : _log{"test.log", std::ios::trunc} {
-        ext::logging::configuration::stream = &_log;
+        using namespace ext::logging;
+        configuration::stream = &_log;
+        configuration::gdb = false;
+        configuration::vim = false;
+        configuration::prefix_newline = false;
+        configuration::append_newline = true;
+        set_level_all(level::EXT_LOGGING_DEFAULT_LEVEL);
     };
 
 
@@ -52,8 +58,6 @@ TEST_F(LoggingTest, logging_no_crash_gdb_vim) {
     using namespace ext::logging;
     configuration::gdb = true;
     configuration::vim = true;
-    configuration::prefix_newline = false;
-    configuration::append_newline = true;
 
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("babe") << "cafe?");
@@ -67,8 +71,6 @@ TEST_F(LoggingTest, logging_no_crash_gdb_vim) {
 
 TEST_F(LoggingTest, logging_no_crash) {
     using namespace ext::logging;
-    configuration::gdb = false;
-    configuration::vim = false;
     configuration::prefix_newline = true;
     configuration::append_newline = false;
 
@@ -78,28 +80,16 @@ TEST_F(LoggingTest, logging_no_crash) {
 }
 
 TEST_F(LoggingTest, logging_level_too_low) {
-    using namespace ext::logging;
-    configuration::gdb = false;
-    configuration::vim = false;
-    configuration::prefix_newline = true;
-    configuration::append_newline = false;
-    topic::network.activation_level = level::error;
-
+    ext::logging::topic::network.activation_level = ext::logging::level::error;
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("music", network, warn) << "Green" << "Day");
     compare("");
 }
 
 TEST_F(LoggingTest, logging_level_ok) {
-    using namespace ext::logging;
-    configuration::gdb = false;
-    configuration::vim = false;
-    configuration::prefix_newline = true;
-    configuration::append_newline = false;
-
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("music", network, error) << "Green" << " Day");
-    compare("\n[music] error (network) logging.cpp:" + line() +" in TestBody(): 'Green Day'");
+    compare("[music] error (network) logging.cpp:" + line() +" in TestBody(): 'Green Day'\n");
 }
 
 // does not die
