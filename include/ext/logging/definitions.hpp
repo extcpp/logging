@@ -61,7 +61,7 @@ struct logtopic {
 } // namespace _detail
 
 namespace configuration {
-extern std::map<int, _detail::logtopic*> topics;
+EXT_EXPORT_VC extern std::map<int, _detail::logtopic*> topics;
 // logging is configured globally via these variables
 // configure logging before you start logging!!!
 EXT_EXPORT_VC extern bool prefix_newline;

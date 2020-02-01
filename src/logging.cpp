@@ -34,8 +34,6 @@ bool configuration::vim{false};
 bool configuration::gdb{false};
 #endif
 std::ostream* configuration::stream = &std::cout;
-
-EXT_INIT_PRIORITY_VC_LOW
 /////////////////////////////////////////////////////////////////////////////
 
 // the logger is a class that creates the log stream and writes
@@ -55,15 +53,12 @@ _detail::logger::logger(
     }
 
     if (configuration::gdb) {
-    #ifndef _WIN32
-        _ss << "# break " << ext::util::filename(file_name) << ":" << line_no << "\n";
-    #endif
+        _ss << "# break " << ext::util::filename(file_name, true, true) << ":" << line_no << "\n";
     }
 #endif
 
-    if (true) {
-        _ss << "[" << id << "] ";
-    }
+    // id
+    _ss << "[" << id << "] ";
     // log level
     _ss << level_to_str(level_);
 
@@ -75,11 +70,7 @@ _detail::logger::logger(
     // log filename
     if (configuration::filename) {
             _ss << " "
-#ifndef _WIN32
-                << ext::util::filename(file_name)
-#else
-                << file_name
-#endif
+                << ext::util::filename(file_name, true, true)
                 << ":" << line_no;
     }
 

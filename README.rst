@@ -1,7 +1,9 @@
-|travis|
+|travis| |appveyor|
 
 Simple Logging Library
 ======================
+Known Issues:
+ - Fails on Windows/VC - `init_seg` problem (used to work)
 
 Advantages:
  - Has variable and constexpr activation level checks. The constexpr check
@@ -26,3 +28,6 @@ Disadvantages:
 
 .. |travis| image:: https://travis-ci.org/extcpp/logging.svg?branch=master
    :target: https://travis-ci.org/extcpp/logging
+
+.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/7evseehi5ejvbgpc/branch/master?svg=true
+   :target: https://ci.appveyor.com/project/obiwahn/logging
