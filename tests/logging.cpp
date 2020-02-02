@@ -23,7 +23,7 @@ struct LoggingTest : public ::testing::Test {
 #ifdef EXT_LOGGING_ENABLE_VIM_GDB
         configuration::gdb = false;
         configuration::vim = false;
-#endif
+#endif // EXT_LOGGING_ENABLE_VIM_GDB
         configuration::prefix_newline = false;
         configuration::append_newline = true;
         configuration::filename = true;
@@ -37,9 +37,13 @@ struct LoggingTest : public ::testing::Test {
     }
 
     std::string path() {
+#ifdef EXT_COMPILER_VC
+        return "logging.cpp";
+#else
         auto path = std::filesystem::current_path().parent_path().parent_path().parent_path() / "logging" / "tests" /
                     "logging.cpp";
         return path.string();
+#endif // EXT_COMPILER_VC
     };
 
     std::string line() {
@@ -57,6 +61,7 @@ TEST_F(LoggingTest, logging_dev) {
     compare("[@@@@] warning (development) logging.cpp:" + line() + " in TestBody(): 'development'\n");
 }
 
+#ifndef EXT_COMPILER_VC
 TEST_F(LoggingTest, logging_dev_if_static) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_DEV_IF_CONST(true) << "development");
@@ -151,7 +156,7 @@ TEST_F(LoggingTest, logging_gdb_vim) {
 #ifdef EXT_LOGGING_ENABLE_VIM_GDB
     configuration::gdb = true;
     configuration::vim = true;
-#endif
+#endif // EXT_LOGGING_ENABLE_VIM_GDB
 
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("babe") << "cafe?");
@@ -160,7 +165,7 @@ TEST_F(LoggingTest, logging_gdb_vim) {
 #ifdef EXT_LOGGING_ENABLE_VIM_GDB
         "# vim "s + path() + " +" + line() + "\n"
         "# break logging.cpp:" + line() + "\n"
-#endif
+#endif // EXT_LOGGING_ENABLE_VIM_GDB
         "[babe] warning logging.cpp:"s +
         line() + " in TestBody(): 'cafe?'\n");
 }
@@ -174,6 +179,7 @@ TEST_F(LoggingTest, logging_prepend_newline) {
     ASSERT_NO_THROW(EXT_LOG("babe") << "2cafe?");
     compare("\n[babe] warning logging.cpp:" + line() + " in TestBody(): '2cafe?'");
 }
+#endif // EXT_COMPILER_VC
 
 // does not die
 #ifndef EXT_COMPILER_VC
@@ -184,6 +190,7 @@ TEST_F(LoggingDeathTest, fatal) {
 }
 #endif // EXT_COMPILER_VC
 
+#ifndef EXT_COMPILER_VC
 TEST_F(LoggingTest, change_all_levels) {
     using namespace ext::logging;
 
@@ -229,3 +236,4 @@ TEST_F(LoggingTest, levels_to_string) {
     EXPECT_STREQ(_detail::level_to_str(level::trace).c_str(), "trace");
     EXPECT_STREQ(_detail::level_to_str(static_cast<level>(1337)).c_str(), "unknown");
 }
+#endif // EXT_COMPILER_VC

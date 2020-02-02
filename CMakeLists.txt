@@ -61,7 +61,7 @@ set(ext_common_compile_definitions
 )
 
 
-add_library(ext-logging ${ext-logging-source} ${ext-logging-header})
+add_library(ext-logging SHARED ${ext-logging-source} ${ext-logging-header})
 target_include_directories(ext-logging PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
@@ -122,9 +122,9 @@ if(COMMAND ext_install)
 endif()
 
 add_custom_target(
-    update_logging_version ALL
+    ext_logging_version_update ALL
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     COMMAND ${CMAKE_COMMAND}
-                -D "EXT_GIT_VERSION_OUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/ext_version.hpp"
+                -D "EXT_GIT_VERSION_OUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/ext_logging_version.hpp"
                 -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/ext_script_git_version.cmake"
 )
