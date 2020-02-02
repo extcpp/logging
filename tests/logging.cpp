@@ -58,39 +58,38 @@ using LoggingDeathTest = LoggingTest;
 TEST_F(LoggingTest, logging_dev) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_DEV << "development");
-    compare("[@@@@] warning (development) logging.cpp:" + line() + " in TestBody(): 'development'\n");
+    compare("[@@@@] warning (development) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'development'\n");
 }
 
-#ifndef EXT_COMPILER_VC
 TEST_F(LoggingTest, logging_dev_if_static) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_DEV_IF_CONST(true) << "development");
-    compare("[@@@@] warning (development) logging.cpp:" + line() + " in TestBody(): 'development'\n");
+    compare("[@@@@] warning (development) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'development'\n");
 }
 
 TEST_F(LoggingTest, logging_dev_variable) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_DEV_VARIABLE << "development");
-    compare("[$$$$] warning (development) logging.cpp:" + line() + " in TestBody(): 'development'\n");
+    compare("[$$$$] warning (development) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'development'\n");
 }
 
 TEST_F(LoggingTest, logging_dev_if) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_DEV_IF(true) << "development");
-    compare("[$$$$] warning (development) logging.cpp:" + line() + " in TestBody(): 'development'\n");
+    compare("[$$$$] warning (development) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'development'\n");
 }
 
 TEST_F(LoggingTest, logging_default) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("badcafe") << "2 Cafe " << "NOHA");
-    compare("[badcafe] warning logging.cpp:" + line() + " in TestBody(): '2 Cafe NOHA'\n");
+    compare("[badcafe] warning logging.cpp:" + line() + " in " + __FUNCTION__ + "(): '2 Cafe NOHA'\n");
 }
 
 TEST_F(LoggingTest, logging_no_filename) {
     ext::logging::configuration::filename = false;
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("badcafe") << "2 Cafe " << "NOHA");
-    compare("[badcafe] warning in TestBody(): '2 Cafe NOHA'\n");
+    compare("[badcafe] warning in "s + __FUNCTION__ + "(): '2 Cafe NOHA'\n");
 }
 
 TEST_F(LoggingTest, logging_no_function) {
@@ -108,28 +107,29 @@ TEST_F(LoggingTest, logging_no_file_no_function) {
     compare("[badcafe] warning: '2 Cafe NOHA'\n");
 }
 
+#ifndef EXT_COMPILER_VC
 TEST_F(LoggingTest, logging_id_level) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("log-id", error) << "Where is Pierre?");
-    compare("[log-id] error logging.cpp:" + line() + " in TestBody(): 'Where is Pierre?'\n");
+    compare("[log-id] error logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'Where is Pierre?'\n");
 }
 
 TEST_F(LoggingTest, logging_id_topic_level) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("log-id", network, error) << "Where is Pierre?");
-    compare("[log-id] error (network) logging.cpp:" + line() + " in TestBody(): 'Where is Pierre?'\n");
+    compare("[log-id] error (network) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'Where is Pierre?'\n");
 }
 
 TEST_F(LoggingTest, logging_id_topic_level_condition_true) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("log-id", network, error, true) << "Where is Pierre?");
-    compare("[log-id] error (network) logging.cpp:" + line() + " in TestBody(): 'Where is Pierre?'\n");
+    compare("[log-id] error (network) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'Where is Pierre?'\n");
 }
 
 TEST_F(LoggingTest, logging_static_id_topic_level_condition_true) {
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG_CONST("log-id", network, error, true) << "Where is Pierre?");
-    compare("[log-id] error (network) logging.cpp:" + line() + " in TestBody(): 'Where is Pierre?'\n");
+    compare("[log-id] error (network) logging.cpp:" + line() + " in " + __FUNCTION__ + "(): 'Where is Pierre?'\n");
 }
 
 TEST_F(LoggingTest, logging_id_topic_level_condition_false) {
@@ -150,6 +150,7 @@ TEST_F(LoggingTest, logging_level_too_low_2) {
     ASSERT_NO_THROW(EXT_LOG("music", network, warn) << "will not be logged");
     compare("");
 }
+#endif // EXT_COMPILER_VC
 
 TEST_F(LoggingTest, logging_gdb_vim) {
     using namespace ext::logging;
@@ -163,11 +164,11 @@ TEST_F(LoggingTest, logging_gdb_vim) {
 
     compare(
 #ifdef EXT_LOGGING_ENABLE_VIM_GDB
-        "# vim "s + path() + " +" + line() + "\n"
+        "# vim "s + __FILE__ + " +" + line() + "\n"
         "# break logging.cpp:" + line() + "\n"
 #endif // EXT_LOGGING_ENABLE_VIM_GDB
         "[babe] warning logging.cpp:"s +
-        line() + " in TestBody(): 'cafe?'\n");
+        line() + " in " + __FUNCTION__ + "(): 'cafe?'\n");
 }
 
 TEST_F(LoggingTest, logging_prepend_newline) {
@@ -177,9 +178,8 @@ TEST_F(LoggingTest, logging_prepend_newline) {
 
     _line = __LINE__ + 1;
     ASSERT_NO_THROW(EXT_LOG("babe") << "2cafe?");
-    compare("\n[babe] warning logging.cpp:" + line() + " in TestBody(): '2cafe?'");
+    compare("\n[babe] warning logging.cpp:" + line() + " in " + __FUNCTION__ + "(): '2cafe?'");
 }
-#endif // EXT_COMPILER_VC
 
 // does not die
 #ifndef EXT_COMPILER_VC
@@ -190,7 +190,6 @@ TEST_F(LoggingDeathTest, fatal) {
 }
 #endif // EXT_COMPILER_VC
 
-#ifndef EXT_COMPILER_VC
 TEST_F(LoggingTest, change_all_levels) {
     using namespace ext::logging;
 
@@ -236,4 +235,3 @@ TEST_F(LoggingTest, levels_to_string) {
     EXPECT_STREQ(_detail::level_to_str(level::trace).c_str(), "trace");
     EXPECT_STREQ(_detail::level_to_str(static_cast<level>(1337)).c_str(), "unknown");
 }
-#endif // EXT_COMPILER_VC

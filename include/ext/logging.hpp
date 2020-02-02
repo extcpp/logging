@@ -75,10 +75,7 @@
 #define _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id_, topic_, macro_level_, cond_) \
     _EXT_LOG_INTERNAL_CONST(id_, (ext::logging::topic::topic_), (ext::logging::level::macro_level_), cond_)
 
-
-#define EXT_LOGCONST4(id, topic_, macro_level_, cond_) \
-    _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, topic_, macro_level_, cond_)
-
+#define EXT_LOGCONST4(id, topic_, macro_level_, cond_) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, topic_, macro_level_, cond_)
 #define EXT_LOGCONST3(id, topic_, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, topic_, macro_level_, true)
 #define EXT_LOGCONST2(id, macro_level_) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, macro_level_, true)
 #define EXT_LOGCONST1(id) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
