@@ -3,7 +3,9 @@
 Simple Logging Library
 ======================
 Known Issues:
- - Fails on Windows/VC - `init_seg` problem (used to work)
+ - Macro expansion with VisualStudio is incorrect!
+   (Maybe we can avoid macros)
+ - Builds on local windows but not appveyor.
 
 Advantages:
  - Has variable and constexpr activation level checks. The constexpr check
@@ -23,7 +25,7 @@ Advantages:
 
 
 Disadvantages:
- - Works only with supported compilers (gcc, clang, msvc).
+ - Works only with supported compilers (gcc, clang).
  - Setup **MUST** happen in single threaded part of application (may change).
 
 .. |travis| image:: https://travis-ci.org/extcpp/logging.svg?branch=master
