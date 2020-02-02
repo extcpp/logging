@@ -31,9 +31,12 @@
 // helper
 #define _EXT_LOG_SELECT5TH_PARAMETER(_1, _2, _3, _4, NAME, ...) NAME
 
+// __VA_ARGS__ do not expand correctly when using VisualStudio compiler :(
+// https://stackoverflow.com/questions/5134523/msvc-doesnt-expand-va-args-correctly
+#define _EXT_LOG_EXPAND(x) x
 
 // variable logging - if() ...
-#define _EXT_LOG_INTERNAL(id_, topic_, macro_level_, cond_)                        \
+#define _EXT_LOG_INTERNAL(id_, topic_, macro_level_, cond_)                                 \
     if (ext::logging::_detail::variable_level_is_active((macro_level_), (topic_)) && cond_) \
     ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
 
@@ -48,14 +51,14 @@
 // 1st __VA_ARGS__ shifts the args into the correct position
 // macro can not be empty because of the leading `,` (fixed with __VA_OPT__ in c++20)
 #ifdef EXT_COMPILER_VC
-    // __VA_ARGS__ does not expand on VisualStudio compiler :(
-    #define _EXT_LOG_EXPAND(x) x
-    #define EXT_LOGVARIABLE(...)                                                                                        \
-        _EXT_LOG_SELECT5TH_PARAMETER(_EXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
+    #define EXT_LOGVARIABLE(...)                                                                                    \
+        _EXT_LOG_SELECT5TH_PARAMETER(                                                                               \
+            _EXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
         (_EXT_LOG_EXPAND(__VA_ARGS__))
 #else
-    #define EXT_LOGVARIABLE(...)                                                                       \
-        _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
+    #define EXT_LOGVARIABLE(...)                                                                   \
+        _EXT_LOG_SELECT5TH_PARAMETER(                                                              \
+            __VA_ARGS__, EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
         (__VA_ARGS__)
 #endif // EXT_COMPILER_VC
 
@@ -64,13 +67,10 @@
 #define EXT_LOG EXT_LOGVARIABLE
 
 
-// This is still a bit experimental:
-// constexpr if() does not seem to work in a macro is there some way that guarantees the evaluation
-// at compile time. Otherwise it would be better to remove this code in order to reduce the complexity.
-
-#define _EXT_LOG_INTERNAL_CONST(id_, topic_, macro_level_, cond_)               \
-    if constexpr (ext::logging::_detail::constexpr_level_is_active(macro_level_) && cond_)      \
-        ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
+// variable logging - if constexpr() ...
+#define _EXT_LOG_INTERNAL_CONST(id_, topic_, macro_level_, cond_)                          \
+    if constexpr (ext::logging::_detail::constexpr_level_is_active(macro_level_) && cond_) \
+    ext::logging::_detail::logger(id_, (topic_), (macro_level_), __FILE__, __LINE__, __FUNCTION__)
 
 #define _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id_, topic_, macro_level_, cond_) \
     _EXT_LOG_INTERNAL_CONST(id_, (ext::logging::topic::topic_), (ext::logging::level::macro_level_), cond_)
@@ -81,12 +81,12 @@
 #define EXT_LOGCONST1(id) _EXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
 
 #ifdef EXT_COMPILER_VC
-    #define _EXT_LOG_EXPAND(x) x
-    #define EXT_LOGCONST(...)                                                                                        \
-        _EXT_LOG_SELECT5TH_PARAMETER(_EXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
+    #define EXT_LOGCONST(...)                                                                           \
+        _EXT_LOG_SELECT5TH_PARAMETER(                                                                   \
+            _EXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
         (_EXT_LOG_EXPAND(__VA_ARGS__))
 #else
-    #define EXT_LOGCONST(...)                                                                       \
+    #define EXT_LOGCONST(...)                                                                                   \
         _EXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
         (__VA_ARGS__)
 #endif // EXT_COMPILER_VC
