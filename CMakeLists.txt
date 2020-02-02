@@ -23,7 +23,6 @@ include(ext_cmake_setup)
 include(ext_cmake_install)
 
 find_package(Threads REQUIRED)
-find_package(Filesystem REQUIRED)
 if(NOT TARGET ext::basics)
     add_subdirectory(external_libs/ext-basics EXCLUDE_FROM_ALL)
 endif()
@@ -74,7 +73,6 @@ target_compile_definitions(ext-logging PRIVATE EXT_IN_LIB=1)
 target_link_libraries(ext-logging PUBLIC
     ext::basics
     Threads::Threads
-    std::filesystem
 )
 
 # set up folder structure for XCode and VisualStudio

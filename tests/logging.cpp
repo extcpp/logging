@@ -1,14 +1,12 @@
 // Copyright - 2016-2020 - Jan Christoph Uhde <Jan@UhdeJC.com>
 // Please see LICENSE.md for license or visit https://github.com/extcpp/basics
 #include <cstring>
-#include <filesystem>
 #include <sstream>
 
 #include <gtest/gtest.h>
 
 #include <ext/macros/platform.hpp>
 #include <ext/util/except.hpp>
-#include <ext/util/files.hpp>
 
 #define EXT_LOGGING_DEFAULT_LEVEL warn
 #include <ext/logging.hpp>
@@ -35,16 +33,6 @@ struct LoggingTest : public ::testing::Test {
     void compare(std::string const& expected = "") {
         ASSERT_EQ(expected, _log.str());
     }
-
-    std::string path() {
-#ifdef EXT_COMPILER_VC
-        return "logging.cpp";
-#else
-        auto path = std::filesystem::current_path().parent_path().parent_path().parent_path() / "logging" / "tests" /
-                    "logging.cpp";
-        return path.string();
-#endif // EXT_COMPILER_VC
-    };
 
     std::string line() {
         return std::to_string(_line);
