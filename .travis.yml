@@ -60,7 +60,6 @@ matrix:
           packages: ['gcc-7', 'g++-7', 'lcov']
 
     - name: "clang"
-      if: branch = travis
       env:
         - CXX=clang++-10
         - CC=clang-10
@@ -73,7 +72,6 @@ matrix:
           packages: ['clang-10', 'clang++-10', 'clang-format-10', 'clang-tools-10', 'libc++-10-dev', 'libc++abi-10-dev']
 
     - name: "mac"
-      if: branch = travis
       os: osx
       osx_image: xcode11.2
       compiler: clang
