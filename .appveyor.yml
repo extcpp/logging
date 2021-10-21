@@ -35,4 +35,5 @@ build_script:
   - cmake --build . --config "%CONFIGURATION%"
 
 test_script:
+  - C:\projects\logging\build_dir\tests\Release\test-ext-logging.exe
   - ctest -C "%CONFIGURATION%" --rerun-failed --output-on-failure -VV
