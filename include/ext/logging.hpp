@@ -50,17 +50,10 @@
 
 // 1st __VA_ARGS__ shifts the args into the correct position
 // macro can not be empty because of the leading `,` (fixed with __VA_OPT__ in c++20)
-#ifdef EXT_COMPILER_VC
-    #define EXT_LOGVARIABLE(...)                                                                                    \
-        eXT_LOG_SELECT5TH_PARAMETER(                                                                               \
-            eXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
-        (eXT_LOG_EXPAND(__VA_ARGS__))
-#else
-    #define EXT_LOGVARIABLE(...)                                                                   \
-        eXT_LOG_SELECT5TH_PARAMETER(                                                              \
-            __VA_ARGS__, EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
+#define EXT_LOGVARIABLE(...)                                                                   \
+    eXT_LOG_SELECT5TH_PARAMETER(                                                               \
+        __VA_ARGS__, EXT_LOGVARIABLE4, EXT_LOGVARIABLE3, EXT_LOGVARIABLE2, EXT_LOGVARIABLE1, ) \
         (__VA_ARGS__)
-#endif // EXT_COMPILER_VC
 
 #define EXT_DEV_VARIABLE eXT_LOG_INTERNAL_ADD_PREFIX("$$$$", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
 #define EXT_DEV_IF(cond_) eXT_LOG_INTERNAL_ADD_PREFIX("$$$$", dev, EXT_LOGGING_DEFAULT_LEVEL, cond_)
@@ -80,16 +73,9 @@
 #define EXT_LOGCONST2(id, macro_level_) eXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, macro_level_, true)
 #define EXT_LOGCONST1(id) eXT_LOG_INTERNAL_ADD_PREFIX_CONST(id, no_topic, EXT_LOGGING_DEFAULT_LEVEL, true)
 
-#ifdef EXT_COMPILER_VC
-    #define EXT_LOGCONST(...)                                                                           \
-        eXT_LOG_SELECT5TH_PARAMETER(                                                                   \
-            eXT_LOG_EXPAND(__VA_ARGS__), EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
-        (eXT_LOG_EXPAND(__VA_ARGS__))
-#else
-    #define EXT_LOGCONST(...)                                                                                   \
-        eXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
-        (__VA_ARGS__)
-#endif // EXT_COMPILER_VC
+#define EXT_LOGCONST(...)                                                                                  \
+    eXT_LOG_SELECT5TH_PARAMETER(__VA_ARGS__, EXT_LOGCONST4, EXT_LOGCONST3, EXT_LOGCONST2, EXT_LOGCONST1, ) \
+    (__VA_ARGS__)
 
 #define EXT_DEV eXT_LOG_INTERNAL_ADD_PREFIX_CONST("@@@@", dev, EXT_LOGGING_DEFAULT_LEVEL, true)
 #define EXT_DEV_IF_CONST(cond_) eXT_LOG_INTERNAL_ADD_PREFIX_CONST("@@@@", dev, EXT_LOGGING_DEFAULT_LEVEL, cond_)
